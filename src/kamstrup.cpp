@@ -1,4 +1,4 @@
-//include <SoftwareSerial.h>
+
 #include <Arduino.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
@@ -20,7 +20,7 @@ int value = 0;
 short kregnums[] = { 0x003C,0x0050,0x0056,0x0057,0x0059,0x004a,0x0044 };                                                   // The registers we want to get out of the meter
 const char* kregstrings[]   = { "Energy","Current Power","Temperature t1","Temperature t2","Temperature diff", "Flow", "Volumen 1" }; // The name of the registers we want to get out of the meter in the same order as above
 #define NUMREGS 7                                                                                                               // Number of registers above
-#define KAMBAUD 1200
+#define KAMBAUD 1200 // Serial com speed for Kamstrup 602 (8N2)
 
 // Units
 const char*  units[65] = {"","Wh","kWh","MWh","GWh","j","kj","Mj",
@@ -31,18 +31,12 @@ const char*  units[65] = {"","Wh","kWh","MWh","GWh","j","kj","Mj",
         "mm:dd","","bar","RTC","ASCII","m3 x 10","ton xr 10","GJ x 10","minutes","Bitfield",
         "s","ms","days","RTC-Q","Datetime"};
 
-// Pin definitions
-#define PIN_KAMSER_RX  16 // Kamstrup IR interface RX
+// Pin definitions for ESP32 Serial2 uart.
+#define PIN_KAMSER_RX  16  // Kamstrup IR interface RX
 #define PIN_KAMSER_TX  17  // Kamstrup IR interface TX
-// #define PIN_LED        13  // Standard Arduino LED
 
 // Kamstrup optical IR serial
-#define KAMTIMEOUT 300  // Kamstrup timeout after transmit
-// SoftwareSerial kamSer(PIN_KAMSER_RX, PIN_KAMSER_TX, false);  // Initialize serial
-//SoftwareSerial kamSer;
-
-// converts character array
-// to string and returns it
+#define KAMTIMEOUT 300     // Kamstrup timeout after transmit
 
 // kamReadReg - read a Kamstrup register
 float kamReadReg(unsigned short kreg) {
@@ -72,13 +66,8 @@ float kamReadReg(unsigned short kreg) {
     
     char tempString[50];
     String test[30];
-    //char regstring[5];
-    // dtostrf(rval, 1, 2, tempString);
-    //Serial.print("Temperature: ");
-    //Serial.println(tempString);
-
-    //String mqstring  = "/" + "/" + tempString;
-    //client.publish("esp32/kamstrup/", tempString);
+    
+    // Send Energy, Temperature in, Temperature out and Temperature difference to MQTT
     switch (kreg) {
       case 0:  // energi
         dtostrf(rval, 1, 3, tempString);
@@ -250,6 +239,7 @@ long crc_1021(byte const *inmsg, unsigned int len){
   return creg;
 }
 
+// Initialize WiFi, and connect.
 void initWiFi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -261,6 +251,8 @@ void initWiFi() {
   Serial.println(WiFi.localIP());
 }
 
+// Callback routine to receive incomming MQTT requests.
+// Presently not used for anything.
 void callback(char* topic, byte* message, unsigned int length) {
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
@@ -274,6 +266,7 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.println();
 }
 
+// Connect to MQTT broker
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -293,19 +286,18 @@ void reconnect() {
   }
 }
 
+// This is where execution starts:
 void setup () {
   Serial.begin(115200);
   Serial.println("BOOT");
-//  pinMode(PIN_LED, OUTPUT);
-//  digitalWrite(PIN_LED, 0);
+
   
   // setup kamstrup serial
   pinMode(PIN_KAMSER_RX,INPUT);
   pinMode(PIN_KAMSER_TX,OUTPUT);
   Serial2.begin(KAMBAUD,SERIAL_8N2);
-  //kamSer.begin(KAMBAUD, SWSERIAL_8N2, PIN_KAMSER_RX, PIN_KAMSER_TX, false,256);
-  //kamSer.begin(KAMBAUD, SWSERIAL_8N2);
 
+  // Start wifi, and connect to mqtt broker
   initWiFi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
@@ -321,12 +313,13 @@ void setup () {
   }
 }
 
+// Main execution loop
 void loop () {
   // check mqtt connected:
   if (!client.connected()) {
     reconnect();
   }
-  client.loop();
+  client.loop();  // Check if anything is received from mqtt.
 
   // poll the Kamstrup registers for data 
   for (int kreg = 0; kreg < NUMREGS; kreg++) {
@@ -334,7 +327,7 @@ void loop () {
     delay(100);
   }
   
-  //digitalWrite(PIN_LED, digitalRead(PIN_KAMSER_RX));
-  delay(5000);
+  // Wait 15 seconds between cycles
+  delay(15000);
 }
 
