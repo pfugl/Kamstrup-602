@@ -1,4 +1,4 @@
-// Insert WiFi credentials here:
+// Insert WiFi credentials here...:
 const char* ssid = "WiFi_ssid";
 const char* password = "WiFi_password";
 
