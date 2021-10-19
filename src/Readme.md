@@ -1,1 +1,0 @@
-Project to get data from Kamstrup 602 heat meter, and publish some of the data to mqtt.
