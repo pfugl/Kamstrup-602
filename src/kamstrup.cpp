@@ -105,7 +105,9 @@ void kamSend(byte const *msg, int msgsize) {
   newmsg[msgsize-2] = (c >> 8);
   newmsg[msgsize-1] = c & 0xff;
 
-  // build final transmit message - escape various bytes
+  // Build final transmit message - escape various bytes:
+  // if one of following reserved bytes exist in the buffer: 06,1b,40,80, replace it with 2 bytes:
+  // 0x1b, plus one complement of the byte.
   byte txmsg[20] = { 0x80 };   // prefix
   int txsize = 1;
   for (int i = 0; i < msgsize; i++) {
@@ -308,7 +310,7 @@ void setup () {
   Serial.println("\n[testKamstrup]");
   // poll the Kamstrup registers for data 
     for (int kreg = 0; kreg < NUMREGS; kreg++) {
-      kamReadReg(kreg);
+    //  kamReadReg(kreg);
       delay(100);
   }
 }
@@ -327,7 +329,7 @@ void loop () {
     delay(100);
   }
   
-  // Wait 15 seconds between cycles
-  delay(15000);
+  // Wait 10 seconds between cycles. If set much higher (f.ex 15000), it may cause MQTT timeouts.
+  delay(10000);
 }
 
