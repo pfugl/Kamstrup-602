@@ -45,7 +45,7 @@ float kamReadReg(unsigned short kreg) {
   float rval;        // this will hold the final value
 
   // prepare message to send and send it
-  byte sendmsg[] = { 0x3f, 0x10, 0x01, (kregnums[kreg] >> 8), (kregnums[kreg] & 0xff) };
+  byte sendmsg[] = { 0x3f, 0x10, 0x01,(byte) (kregnums[kreg] >> 8),(byte) (kregnums[kreg] & 0xff) };
   kamSend(sendmsg, 5);
 
   // listen if we get an answer
