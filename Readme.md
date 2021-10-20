@@ -9,3 +9,6 @@ Before compiling:
 1.  Add the PubSubClient library to the project
 2.  Rename credentials.h.exampel to credentials.h 
 3.  Insert the needed information for WiFi, and MQTT broker credentials into the credentials.h file.
+
+This changed version and the original version is licensed under the folllowing license:  
+ https://creativecommons.org/licenses/by-sa/4.0/
