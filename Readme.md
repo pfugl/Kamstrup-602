@@ -10,5 +10,8 @@ Before compiling:
 2.  Rename credentials.h.exampel to credentials.h 
 3.  Insert the needed information for WiFi, and MQTT broker credentials into the credentials.h file.
 
+If you hava a problem to connect (receive timeouts), try to turn the infrared head 180 degrees clockvise and back again in order to activate the magnetic sensor in the meter. It may take a few tries to get it working. The transmit IR in the meter, is placed to the right when looking to the front of the meter.
+You can also activate the meter transmission by pressing any buttom on the meter, and it will transmit for some time (5-10 minutes), and then stop if the magnetic sensor is not activated.
+
 This changed version and the original version is licensed under the folllowing license:  
  https://creativecommons.org/licenses/by-sa/4.0/
