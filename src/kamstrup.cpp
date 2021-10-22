@@ -144,6 +144,7 @@ unsigned short kamReceive(byte recvmsg[]) {
     // handle rx timeout
     if(millis()-starttime > KAMTIMEOUT) {
       Serial.println("Timed out listening for data");
+      client.publish("esp32/timeout", "Timeout");
       return 0;
     }
 
