@@ -330,7 +330,7 @@ void loop () {
     delay(100);
   }
   
-  // Wait 10 seconds between cycles. If set much higher (f.ex 15000), it may cause MQTT timeouts.
-  delay(2000);
+  // Wait 5 seconds between cycles. If set much higher (f.ex 15000), it may cause MQTT timeouts.
+  delay(5000);
 }
 
