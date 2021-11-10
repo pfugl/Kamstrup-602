@@ -81,9 +81,14 @@ float kamReadReg(unsigned short kreg) {
       case 3: // Temperatur ud
         dtostrf(rval, 1, 1, tempString);
         client.publish("esp32/tempout", tempString);
+        break;
       case 4: // Temperatur diff
         dtostrf(rval, 1, 1, tempString);
         client.publish("esp32/tempdiff", tempString);
+        break;
+      case 5: // Water flow
+        dtostrf(rval, 1, 0, tempString);
+        client.publish("esp32/flow", tempString);
         break;
       default:
         break;
