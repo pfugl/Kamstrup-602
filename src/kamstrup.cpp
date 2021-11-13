@@ -70,19 +70,23 @@ float kamReadReg(unsigned short kreg) {
     
     // Send Energy, Temperature in, Temperature out and Temperature difference to MQTT
     switch (kreg) {
-      case 0:  // energi
+      case 0:  // Total energy reading
         dtostrf(rval, 1, 3, tempString);
         client.publish("esp32/energy", tempString);
         break;
-      case 2: // Temperatur ind
+      case 1:  // Current power
+        dtostrf(rval, 1, 1, tempString);
+        client.publish("esp32/currentpower", tempString);
+        break;
+      case 2: // Temperature in
         dtostrf(rval, 1, 1, tempString);
         client.publish("esp32/tempin", tempString);
         break;
-      case 3: // Temperatur ud
+      case 3: // Temperature out
         dtostrf(rval, 1, 1, tempString);
         client.publish("esp32/tempout", tempString);
         break;
-      case 4: // Temperatur diff
+      case 4: // Temperature diff
         dtostrf(rval, 1, 1, tempString);
         client.publish("esp32/tempdiff", tempString);
         break;
