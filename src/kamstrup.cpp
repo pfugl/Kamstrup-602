@@ -16,6 +16,9 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
+// Variables for millis() loop.
+const long interval = 5000; // Data sent every 5000 msec's
+unsigned long previousMillis = 0;
 
 
 short kregnums[] = { 0x003C,0x0050,0x0056,0x0057,0x0059,0x004a,0x0044 };                                                   // The registers we want to get out of the meter
@@ -359,21 +362,27 @@ ArduinoOTA.begin();
 
 // Main execution loop
 void loop () {
+  unsigned long currentMillis = millis();
   // Handle ArduinoOTA 
   ArduinoOTA.handle();
+
   // check mqtt connected:
   if (!client.connected()) {
-    reconnect();
+      reconnect();
   }
   client.loop();  // Check if anything is received from mqtt.
 
-  // poll the Kamstrup registers for data 
-  for (int kreg = 0; kreg < NUMREGS; kreg++) {
-    kamReadReg(kreg);
-    delay(100);
+  if(currentMillis - previousMillis >= interval)
+  { 
+    previousMillis = currentMillis;
+    
+    // poll the Kamstrup registers for data 
+    for (int kreg = 0; kreg < NUMREGS; kreg++) {
+      kamReadReg(kreg);
+      delay(100);
+    }
   }
   
-  // Wait 5 seconds between cycles. If set much higher (f.ex 15000), it may cause MQTT timeouts.
-  delay(5000);
+  
 }
 
