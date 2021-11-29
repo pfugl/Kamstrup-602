@@ -256,15 +256,34 @@ long crc_1021(byte const *inmsg, unsigned int len){
 }
 
 // Initialize WiFi, and connect.
-void initWiFi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi ..");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print('.');
-    delay(1000);
-  }
+void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("Connected to AP succesfully");
+}
+void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("WiFi connected");
+  Serial.println("IP adress: ");
   Serial.println(WiFi.localIP());
+}
+
+void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("Disconnected from WiFi AP");
+  Serial.println("WiFi lost connection. Reason: ");
+  Serial.println(info.disconnected.reason);
+  Serial.println("Trying to reconnect");
+  WiFi.begin(ssid, password);
+}
+
+// Initialize WiFi, and connect.
+void initWiFi() {
+  WiFi.disconnect(true);
+  delay(1000);
+  WiFi.onEvent(WiFiStationConnected, SYSTEM_EVENT_STA_CONNECTED);
+  WiFi.onEvent(WiFiGotIP, SYSTEM_EVENT_STA_GOT_IP);
+  WiFi.onEvent(WiFiStationDisconnected, SYSTEM_EVENT_STA_DISCONNECTED);
+  WiFi.begin(ssid, password);
+  Serial.println();
+  Serial.println();
+  Serial.println("Wait for WiFi... ");
 }
 
 // Callback routine to receive incomming MQTT requests.
